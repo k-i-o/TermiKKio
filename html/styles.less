@@ -152,7 +152,10 @@ html {
                     overflow-x: auto;
                     overflow-y: auto;
                     position: relative;
-
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    
                     &::-webkit-scrollbar {
                         width: 7px;
                         height: 7px;
@@ -234,11 +237,13 @@ html {
                         font-style: normal;            
                     }
 
+
                     .outputs {
                         width: 100%;                    
                         display: flex;
                         align-items: flex-start;
                         flex-direction: column;
+                        gap: 10px;
 
                         .cmd-output-wrapper {
                             width: 100%;

@@ -76,6 +76,63 @@ const commands = [
 
             output(`Wallpaper <a href="${args[0]}">changed</a>`);
         }
+    },
+    {
+        command: "neofetch",
+        usage: "neofetch",
+        description: "Display system information",
+        action: async (args) => {
+            const os = navigator.platform;
+            const browser = navigator.appCodeName;
+            const version = navigator.appVersion;
+            const user = navigator.userAgent;
+            const req = await fetch("https://api.ipify.org?format=json");
+            const { ip } = await req.json();
+            const outputHtml = `
+                <style>
+                    .neofetch {
+                        display: flex;
+                    }
+                    
+                    .neofetch-logo {
+                        width: 100px;
+                        height: 100px;
+                        margin-right: 10px;
+                    }
+
+                    .neofetch-info {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: flex-start;
+                        gap: 3px;
+                    }
+                    
+                    .neofetch-info-item {
+                        display: flex;
+                        justify-content: flex-start;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                </style>
+
+                <div class="neofetch">
+                    <div class="neofetch-logo">
+                        <span class="logo">_</span>
+                        <span class="logo">_</span>
+                        <span class="logo">_</span>
+                    </div>
+                    <div class="neofetch-info">
+                        <span>OS: ${os}</span>
+                        <span>Browser: ${browser}</span>
+                        <span>Version: ${version}</span>
+                        <span>User Agent: ${user}</span>
+                        <span>User ip: ${ip}</span>
+                    </div>
+                </div>
+            `;
+            output(outputHtml);
+        }
     }
 ];
 
@@ -193,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.querySelector('#username').innerText = username;
     commandsInput().focus();
+    getcommands();
 });
 
 const previousCmd = () => {
@@ -213,7 +271,8 @@ const nextCmd = () => {
 
 const output = (msg) => {
     const out = document.querySelector('.outputs');
-    out.innerHTML += `
+
+    const outHtml = `
         <div class="cmd-output-wrapper">
             <div class="input"> 
                 <div class="terminal-inputs-wrapper"> 
@@ -227,21 +286,39 @@ const output = (msg) => {
         </div>
     `;
 
+    if (out === null) {
+        const input = document.querySelector('.context .input').outerHTML;
+        document.querySelector('.context').innerHTML = `<div class="outputs">${outHtml}</div>${input}`;
+        getcommands();
+        commandsInput().focus();
+    } else {
+        out.innerHTML += outHtml;
+    }
+
 }
 
 const exec = (cmdline) => {
-    const [cmd, ...args] = cmdline.split(' ');
+    return new Promise(async (resolve, reject) => {
+        const [cmd, ...args] = cmdline.split(' ');
 
-    const command = commands.find((c) => c.command === cmd);
+        const command = commands.find((c) => c.command === cmd);
 
-    if (command) {
-        command.action(args);
-    } else {
-        output(cmd, `Command not found: ${command.command}`);
-    }
+        if (command) {
+            if (command.action instanceof Function) {
+                if (command.action.constructor.name === "AsyncFunction") {
+                    await command.action(args);
+                } else {
+                    command.action(args); 
+                }
+            }
+        } else {
+            output(`Command not found: ${cmd}`);
+        }
 
-    cmdsHistory.addToHistory(cmdline);
-    commandsInput().value = '';
+        cmdsHistory.addToHistory(cmdline);
+        commandsInput().value = '';
+        resolve();
+    });	
 }
 
 const reset = () => {
@@ -266,7 +343,7 @@ const loadSuggestions = () => {
     suggestedCmdsIndex = suggestedCmdsIndex >= suggestedCmds.length - 1 ? 0 : suggestedCmdsIndex + 1;
 }
 
-commandsInput().addEventListener('keydown', (e) => {
+const getcommands = () => commandsInput().addEventListener('keydown', async (e) => {
     e = e || window.event;
 
     switch(e.key) {
@@ -298,7 +375,7 @@ commandsInput().addEventListener('keydown', (e) => {
         return;
     case 'Enter':
         if (commandsInput().value.length) {
-            exec(commandsInput().value);
+            await exec(commandsInput().value);
             context().scrollBy(0, context().scrollHeight);
             reset();
             document.querySelector('.tips').classList.add('hide');
