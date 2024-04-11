@@ -1,0 +1,234 @@
+@border-radius: 8px;
+@border-width: 3px;
+
+@accent: #3fd665;
+
+@mobile: ~'(max-width: 430px)';
+@tablet: ~'(max-width: 770px)';
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    line-height: 1.5;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    color: white;
+
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('bg1.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;    
+        font-family: "Roboto", sans-serif;
+        font-weight: 100;
+        font-style: normal;
+        font-size: 16px;
+
+        h1, h2, h3, h4, h5, h6 {
+            margin: 0;
+            padding: 0;
+            font-weight: 400;
+        }
+
+        b {
+            font-weight: 600;
+            color: @accent;
+        }
+
+        input[type=text] {
+            border: none;
+            outline: none;
+            background-color: transparent;
+            color: white;
+            padding: 0;
+            margin: 0;
+            font-size: 1.2em;
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+            font-weight: 100;
+            font-size: 95%;
+        }
+
+        .hide {
+            display: none !important;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+
+            .title {
+                position: absolute;
+                top: 20px;
+                font-size: 3.5rem;
+
+                @media @tablet {
+                    top: 10px;
+                    font-size: 2.5rem;
+                }
+            }
+
+            .glass {
+                border: @border-width solid rgba(33,33,33, 0.7);
+                background-color: rgba(33,33,33, 0.5);
+                overflow: hidden;
+                position: relative;
+
+                >* {
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .glass-effect {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    backdrop-filter: blur(6px);
+                    scale: 1.5;
+                    z-index: 0;
+                }
+            }
+
+            .card {
+                border-radius: @border-radius;
+                color: white;
+                box-shadow: 0 0 15px 0 #00000056;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: clamp(400px, 60vw, 1000px);
+                height: clamp(250px, 65vh, 1000px);
+                position: relative;
+                
+                @media @tablet {
+                    width: clamp(300px, 90vw, 600px);
+                    height: clamp(50px, 80vh, 900px);
+                }
+
+                @media @mobile {
+                    width: clamp(300px, 90vw, 350px);
+                }
+
+                .context {
+                    padding: 15px;
+                    width: 100%;
+                    height: 100%;
+                    overflow-x: auto;
+                    overflow-y: auto;
+                    position: relative;
+
+                    &::-webkit-scrollbar {
+                        width: 7px;
+                        height: 7px;
+                    }
+
+                    &::-webkit-scrollbar-track {
+                        background: rgba(33,33,33, 0.5);
+                    }
+
+                    &::-webkit-scrollbar-thumb {
+                        background: rgba(33,33,33, 1);
+                        border-radius: 4px;
+                    }
+
+                    &::-webkit-scrollbar-thumb:hover {
+                        background: rgba(33,33,33, 0.7);
+                    }
+
+                    h2 {
+                        width: 100%;
+                        text-align: center;
+                    }
+
+                    .input {
+                        display: flex;
+                        justify-content: center;
+                        align-items: flex-start;
+                        width: 100%;
+                        flex-direction: column;
+                            
+                        .terminal-inputs-wrapper {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            gap: 10px;
+                            width: 100%;
+
+                            .info {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                gap: 5px;
+
+                                .path {
+                                    color: @accent;
+                                    font-size: 110%;
+                                    font-weight: bold;
+                                }
+                            }
+                        }
+                    }
+
+                    .tips {
+                        width: 100%;
+                        font-size: 80%;
+                        display: flex;
+                        flex-direction: column;
+
+                        .suggested-cmds-list {          
+                            width: 100%;
+                            display: flex;
+                            flex-wrap: wrap;
+                            column-gap: 15px;
+
+                            .suggested-cmd {
+                                opacity: .5;
+
+                                &.selected { 
+                                    opacity: 1;
+                                }
+                            }
+                        }
+                    }
+
+                    .output, .input {
+                        font-family: "Source Code Pro", monospace;
+                        font-optical-sizing: auto;
+                        font-weight: 100;
+                        font-style: normal;            
+                    }
+
+                    .outputs {
+                        width: 100%;                    
+                        display: flex;
+                        align-items: flex-start;
+                        flex-direction: column;
+
+                        .cmd-output-wrapper {
+                            width: 100%;
+
+                            .output {
+                                width: 100%;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
