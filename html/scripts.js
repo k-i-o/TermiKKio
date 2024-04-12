@@ -1,140 +1,6 @@
 'use strict';
 
-const escapeHtml = (unsafe) => {
-    return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
-}
-
 let cmdsHistory = [];
-//- const cmds = ["help", "setusername", "clear", "echo"];
-const commands = [
-    { 
-        command: "help", 
-        usage: "help", 
-        description: "List all available commands", 
-        action: () => {
-            output(commands.map((c) => `${escapeHtml(c.usage)} - ${escapeHtml(c.description)}`).join('<br>')) 
-        }
-    },
-    { 
-        command: "setusername",
-        usage: "setusername <username>", 
-        description: "Set username", 
-        action: (args) => { 
-            localStorage.setItem('username', args[0]); 
-            username = args[0]; 
-            document.querySelector('#username').innerText = username; 
-            output(`Username set to: ${args[0]}`); 
-        }
-    },
-    { 
-        command: "clear", 
-        usage: "clear", 
-        description: "Clear the terminal", 
-        action: () => {
-            document.querySelector('.outputs').innerHTML = '';
-        }
-    },
-    { 
-        command: "echo", 
-        usage: "echo <message>", 
-        description: "Print message", 
-        action: (args) => { 
-            output(args.join(' '));
-        }
-    },
-    {
-        command: "open",
-        usage: "open <url>",
-        description: "Open the url in a new tab",
-        action: (args) => {
-            output(`Opening ${args[0]}...`);
-            if (!args[0].startsWith('http')) {
-                args[0] = 'http://' + args[0];
-            }
-            window.open(args[0], '_blank');
-        }
-    },
-    {
-        command: "search",
-        usage: "search <query>",
-        description: "Search the query on Google",
-        action: (args) => {
-            output(`Searching ${args.join(' ')} on Google...`);
-            window.open('https://www.google.com/search?q=' + args.join('+'), '_blank');
-        }
-    },
-    {
-        command: "wallpaper",
-        usage: "wallpaper <path>",
-        description: "Set the wallpaper, provide the path of the image (url or local path)",
-        action: (args) => {
-            localStorage.setItem('wallpaper', args[0]);
-            background().attributes.src.value = args[0];
-
-            const newAccent = `rgb(${increaseSaturation(getDominantColor(background()), 0.6)})`;
-            document.documentElement.style.setProperty('--accent', newAccent);
-
-            output(`Wallpaper <a href="${args[0]}">changed</a>`);
-        }
-    },
-    {
-        command: "neofetch",
-        usage: "neofetch",
-        description: "Display system information",
-        action: async (args) => {
-            const os = navigator.platform;
-            const browser = navigator.appCodeName;
-            const version = navigator.appVersion;
-            const user = navigator.userAgent;
-            const req = await fetch("https://api.ipify.org?format=json");
-            const { ip } = await req.json();
-            const outputHtml = `
-                <style>
-                    .neofetch {
-                        display: flex;
-                    }
-                    
-                    .neofetch-logo {
-                        width: 100px;
-                        height: 100px;
-                        margin-right: 10px;
-                    }
-
-                    .neofetch-info {
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: flex-start;
-                        gap: 3px;
-                    }
-                    
-                    .neofetch-info-item {
-                        display: flex;
-                        justify-content: flex-start;
-                        align-items: center;
-                        gap: 10px;
-                    }
-                </style>
-
-                <div class="neofetch">
-                    <div class="neofetch-logo">
-                        <span class="logo">_</span>
-                        <span class="logo">_</span>
-                        <span class="logo">_</span>
-                    </div>
-                    <div class="neofetch-info">
-                        <span>OS: ${os}</span>
-                        <span>Browser: ${browser}</span>
-                        <span>Version: ${version}</span>
-                        <span>User Agent: ${user}</span>
-                        <span>User ip: ${ip}</span>
-                    </div>
-                </div>
-            `;
-            output(outputHtml);
-        }
-    }
-];
 
 let suggestedCmds = commands;
 let suggestedCmdsIndex = 0;
@@ -147,94 +13,6 @@ const context = () => document.querySelector('.context');
 const suggestions = () => document.querySelector('.suggested-cmds-list');
 const commandsInput = () => document.getElementById('commands');
 const background = () => document.querySelector('#bg');
-
-Object.defineProperty(Array.prototype, "addToHistory", {
-    value: function addToHistory(cmd) {
-        cmdsHistory.push(cmd);
-        localStorage.setItem('cmdsHistory', JSON.stringify(cmdsHistory));
-    },
-    writable: true,
-    configurable: true,
-});
-
-
-function getDominantColor(imageObject) {
-    
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = 1;
-    canvas.height = 1;
-
-    ctx.drawImage(imageObject, 0, 0, 1, 1);
-
-    const i = ctx.getImageData(0, 0, 1, 1).data;
-
-    return [i[0], i[1], i[2]];
-}  
-
-function increaseSaturation(rgb, sat) {
-    let r = rgb[0] / 255;
-    let g = rgb[1] / 255;
-    let b = rgb[2] / 255;
-    
-    let max = Math.max(r, g, b);
-    let min = Math.min(r, g, b);
-    
-    let l = (max + min) / 2;
-    
-    let sat_l = (max - min) / (1 - Math.abs(2 * l - 1));
-    
-    let new_sat_l = sat_l + sat;
-    new_sat_l = Math.min(Math.max(new_sat_l, 0), 1);
-    
-    let c = (1 - Math.abs(2 * l - 1)) * new_sat_l;
-    let h = 0;
-    if (max === r) {
-      h = 60 * (((g - b) / (max - min)) % 6);
-    } else if (max === g) {
-      h = 60 * (((b - r) / (max - min)) + 2);
-    } else {
-      h = 60 * (((r - g) / (max - min)) + 4);
-    }
-    
-    let x = c * (1 - Math.abs((h / 60) % 2 - 1));
-    let m = l - c / 2;
-    
-    let new_r, new_g, new_b;
-    
-    if (0 <= h && h < 60) {
-      new_r = c;
-      new_g = x;
-      new_b = 0;
-    } else if (60 <= h && h < 120) {
-      new_r = x;
-      new_g = c;
-      new_b = 0;
-    } else if (120 <= h && h < 180) {
-      new_r = 0;
-      new_g = c;
-      new_b = x;
-    } else if (180 <= h && h < 240) {
-      new_r = 0;
-      new_g = x;
-      new_b = c;
-    } else if (240 <= h && h < 300) {
-      new_r = x;
-      new_g = 0;
-      new_b = c;
-    } else {
-      new_r = c;
-      new_g = 0;
-      new_b = x;
-    }
-    
-    new_r = Math.round((new_r + m) * 255);
-    new_g = Math.round((new_g + m) * 255);
-    new_b = Math.round((new_b + m) * 255);
-    
-    return [new_r, new_g, new_b];
-}
   
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -301,7 +79,7 @@ const exec = (cmdline) => {
     return new Promise(async (resolve, reject) => {
         const [cmd, ...args] = cmdline.split(' ');
 
-        const command = commands.find((c) => c.command === cmd);
+        const command = commands.find((c) => c && (c.command === cmd || (c.aliases && c.aliases.includes(cmd))));
 
         if (command) {
             if (command.action instanceof Function) {
@@ -387,7 +165,7 @@ const getcommands = () => commandsInput().addEventListener('keydown', async (e) 
 
     document.querySelector('.tips').classList.add('hide');
     reset();
-    suggestedCmds = commands.filter((c) => c.command.toLowerCase().includes(commandsInput().value.toLowerCase()));
+    suggestedCmds = commands.filter((c) => getCost(c.command, commandsInput().value) < 3);
 
 });
 
