@@ -13,8 +13,12 @@ const context = () => document.querySelector('.context');
 const suggestions = () => document.querySelector('.suggested-cmds-list');
 const commandsInput = () => document.getElementById('commands');
 const background = () => document.querySelector('#bg');
+
+const startCommands = ["neofetch", "echo welcome!"];
   
-document.addEventListener('DOMContentLoaded', () => {
+commands = commands.filter((c) => c.enabled != false);
+
+document.addEventListener('DOMContentLoaded', async () => {
 
     username = localStorage.getItem('username') || 'user';
     cmdsHistory = localStorage.getItem('cmdsHistory') || [];
@@ -29,6 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#username').innerText = username;
     commandsInput().focus();
     getcommands();
+
+    for(let cmd of startCommands) {
+        await exec(cmd);
+    }
 });
 
 const previousCmd = () => {
@@ -47,7 +55,7 @@ const nextCmd = () => {
     commandsInput().value = cmdsHistory[cmdsHistoryIndex];
 }
 
-const output = (msg) => {
+const output = (msg) => { // should be changed
     const out = document.querySelector('.outputs');
 
     const outHtml = `
@@ -95,10 +103,16 @@ const exec = (cmdline) => {
             output(`Command not found: ${cmd}`);
         }
 
-        cmdsHistory.addToHistory(cmdline);
-        commandsInput().value = '';
         resolve();
     });	
+}
+
+const execFromCLI = async (cmdline) => {
+
+    exec(cmdline);
+
+    cmdsHistory.addToHistory(cmdline);
+    commandsInput().value = '';
 }
 
 const reset = () => {

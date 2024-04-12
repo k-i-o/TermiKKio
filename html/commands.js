@@ -1,4 +1,4 @@
-const commands = [
+let commands = [
     { 
         command: "help", 
         usage: "help", 
@@ -63,8 +63,51 @@ const commands = [
     {
         command: "wallpaper",
         usage: "wallpaper <path>",
-        description: "Set the wallpaper, provide the path of the image (url or local path)",
+        description: "Set the wallpaper, provide the path of the image (url or local path) use -r to remove the wallpaper eg. wallpaper -r",//, use -s to save the wallpaper eg. wallpaper -s <name>",
         action: (args) => {
+            if (args[0] === '-r') {
+                localStorage.removeItem('wallpaper');
+                background().attributes.src.value = 'https://source.unsplash.com/random/1920x1080';
+                document.documentElement.style.setProperty('--accent', getDominantColor(background()));
+                output(`Wallpaper <a href="https://source.unsplash.com/random/1920x1080">removed</a>`);
+                return;
+            }
+
+            // if (args[0] === '-s') {
+                    
+            //     if (!args.length) {
+            //         output(`Please provide a name for the wallpaper`);
+            //         return;
+            //     }
+
+            //     let wallpapers = localStorage.getItem('wallpapers');
+            //     if (wallpapers) {
+            //         wallpapers = JSON.parse(wallpapers);
+
+            //         if(wallpapers.find((w) => w.name === args[1])) {
+            //             output(`Wallpaper's name already in use, please choose another name`);
+            //             return;
+            //         }
+
+            //         let existingWallpaper = wallpapers.find((w) => w.url === background().attributes.src.value);
+
+            //         if(existingWallpaper) {
+            //             output(`Wallpaper already exists with name <u>${existingWallpaper.name}</u>`);
+            //             return;
+            //         }
+
+            //         wallpapers.push({name: args[1], url: background().attributes.src.value});
+                    
+            //         localStorage.setItem('wallpapers', JSON.stringify(wallpapers));
+            //         output(`Wallpaper saved with name ${args[1]}`);
+            //     } else {
+            //         localStorage.setItem('wallpapers', JSON.stringify([{name: args[1], url: background().attributes.src.value}]));
+            //         output(`Wallpaper saved with name ${args[1]}`);
+            //     }
+
+            //     return;
+            // }
+
             localStorage.setItem('wallpaper', args[0]);
             background().attributes.src.value = args[0];
 
@@ -72,6 +115,21 @@ const commands = [
             document.documentElement.style.setProperty('--accent', newAccent);
 
             output(`Wallpaper <a href="${args[0]}">changed</a>`);
+        }
+    },
+    {
+        enabled: false,
+        command: "wallpapers",
+        usage: "See all saved wallpapers",
+        description: "Save the current wallpaper",
+        action: () => {
+            const wallpapers = Object.keys(localStorage).filter((key) => key.startsWith('wallpaper-'));
+            if (!wallpapers.length) {
+                output(`No wallpapers saved`);
+                return;
+            }
+
+            output(wallpapers.map((w) => `<a href="${localStorage.getItem(w)}">${w}</a>`).join('<br>'));
         }
     },
     {
