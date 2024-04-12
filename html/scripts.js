@@ -73,6 +73,8 @@ const output = (msg) => {
         out.innerHTML += outHtml;
     }
 
+    context().scrollBy(0, context().scrollHeight);
+
 }
 
 const exec = (cmdline) => {
@@ -154,10 +156,13 @@ const getcommands = () => commandsInput().addEventListener('keydown', async (e) 
     case 'Enter':
         if (commandsInput().value.length) {
             await exec(commandsInput().value);
-            context().scrollBy(0, context().scrollHeight);
-            reset();
-            document.querySelector('.tips').classList.add('hide');
+        } else {
+            output('');
         }
+
+        reset();
+        document.querySelector('.tips').classList.add('hide');
+        
         return;
     }
 
@@ -180,4 +185,6 @@ document.addEventListener("keydown", (e) => {
         loadSuggestions();
         commandsInput().focus();
     }
+
+    context().scrollBy(0, context().scrollHeight);
 });
