@@ -40,7 +40,7 @@ const commands = [
     {
         command: "open",
         usage: "open <url>",
-        aliases: ["s"],
+        aliases: ["o"],
         description: "Open the url in a new tab",
         action: (args) => {
             output(`Opening ${args[0]}...`);
