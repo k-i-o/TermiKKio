@@ -57,9 +57,9 @@ const commands = [
         description: "Search the query on Google",
         action: (args) => {
             output(`Searching ${args.join(' ')} on Google...`);
-            window.open('https://www.google.com/search?q=' + args.join('+'), '_blank');
+            window.open('https://www.google.com/search?q=' + encodeURIComponent(args.join(' ')), '_blank');
         }
-    },
+    }, 
     {
         command: "wallpaper",
         usage: "wallpaper <path>",
