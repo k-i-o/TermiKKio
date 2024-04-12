@@ -170,7 +170,7 @@ const getcommands = () => commandsInput().addEventListener('keydown', async (e) 
 
     document.querySelector('.tips').classList.add('hide');
     reset();
-    suggestedCmds = commands.filter((c) => getCost(c.command, commandsInput().value) < 3);
+    suggestedCmds = commands.filter((c) => getCost(c.command, commandsInput().value) < 3 || c.command.includes(commandsInput().value));
 
 });
 
