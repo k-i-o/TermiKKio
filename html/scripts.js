@@ -169,7 +169,7 @@ const getcommands = () => commandsInput().addEventListener('keydown', async (e) 
         return;
     case 'Enter':
         if (commandsInput().value.length) {
-            await exec(commandsInput().value);
+            await execFromCLI(commandsInput().value);
         } else {
             output('');
         }
